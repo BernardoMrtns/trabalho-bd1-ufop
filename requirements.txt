@@ -1,0 +1,8 @@
+# Dependências do SportsLeagueDB.
+#
+# OBS.: o enunciado proíbe ORM e APIs de alto nível. Usamos SOMENTE o driver
+# psycopg2 para conexão com o PostgreSQL. Todas as consultas são escritas em
+# SQL puro.
+
+# Driver de conexão com o PostgreSQL (NÃO é ORM).
+psycopg2-binary==2.9.9
