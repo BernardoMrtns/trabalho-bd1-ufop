@@ -50,7 +50,7 @@ def _build_dsn(dbname: str | None = None) -> str:
     return (
         f"host={DBConfig.HOST} port={DBConfig.PORT} user={DBConfig.USER} "
         f"password='{pw}' dbname={db} "
-        f"options=-c client_encoding=UTF8"
+        f"client_encoding=UTF8"
     )
 
 

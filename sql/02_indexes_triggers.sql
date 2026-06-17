@@ -22,7 +22,7 @@ CREATE INDEX idx_pessoa_cpf         ON pessoa(cpf);
 -- EXTENSÃO pg_trgm (busca aproximada por nome) — opcional.
 -- Tenta criar; se faltar privilégio, cai no ILIKE simples (ver views/consultas).
 -- ---------------------------------------------------------------------
-DO $
+DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_trgm') THEN
         CREATE EXTENSION IF NOT EXISTS pg_trgm;
@@ -30,7 +30,7 @@ BEGIN
     END IF;
 EXCEPTION WHEN insufficient_privilege OR feature_not_supported THEN
     RAISE NOTICE 'Extensão pg_trgm não pôde ser criada (sem privilégio). Consultas por nome usarão ILIKE.';
-END $;
+END $$;
 
 -- ---------------------------------------------------------------------
 -- TRIGGER 1: R3 — impedir contrato ativo duplicado na mesma temporada
