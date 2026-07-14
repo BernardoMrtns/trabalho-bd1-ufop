@@ -1,11 +1,3 @@
--- =====================================================================
--- SportsLeagueDB — Índices e Gatilhos (Triggers)
--- Etapa 4
--- =====================================================================
-
--- ---------------------------------------------------------------------
--- ÍNDICES (para acelerar consultas comuns)
--- ---------------------------------------------------------------------
 CREATE INDEX idx_partida_temporada  ON partida(id_temporada);
 CREATE INDEX idx_partida_mandante   ON partida(id_mandante);
 CREATE INDEX idx_partida_visitante  ON partida(id_visitante);
@@ -18,10 +10,6 @@ CREATE INDEX idx_contrato_temporada ON contrato(id_temporada);
 CREATE INDEX idx_pessoa_nome        ON pessoa(nome);
 CREATE INDEX idx_pessoa_cpf         ON pessoa(cpf);
 
--- ---------------------------------------------------------------------
--- EXTENSÃO pg_trgm (busca aproximada por nome) — opcional.
--- Tenta criar; se faltar privilégio, cai no ILIKE simples (ver views/consultas).
--- ---------------------------------------------------------------------
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_trgm') THEN
@@ -32,10 +20,6 @@ EXCEPTION WHEN insufficient_privilege OR feature_not_supported THEN
     RAISE NOTICE 'Extensão pg_trgm não pôde ser criada (sem privilégio). Consultas por nome usarão ILIKE.';
 END $$;
 
--- ---------------------------------------------------------------------
--- TRIGGER 1: R3 — impedir contrato ativo duplicado na mesma temporada
--- (atleta não pode jogar por duas equipes ao mesmo tempo)
--- ---------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION chk_contrato_atleta_unico() RETURNS TRIGGER AS $$
 DECLARE
     conflito_id INTEGER;
@@ -62,9 +46,6 @@ CREATE TRIGGER trg_contrato_atleta_unico
     BEFORE INSERT OR UPDATE ON contrato
     FOR EACH ROW EXECUTE FUNCTION chk_contrato_atleta_unico();
 
--- ---------------------------------------------------------------------
--- TRIGGER 2: R4 — equipes da partida devem estar inscritas na temporada
--- ---------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION chk_partida_inscricoes() RETURNS TRIGGER AS $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM inscricao_temporada
@@ -85,10 +66,6 @@ CREATE TRIGGER trg_partida_inscricoes
     BEFORE INSERT OR UPDATE ON partida
     FOR EACH ROW EXECUTE FUNCTION chk_partida_inscricoes();
 
--- ---------------------------------------------------------------------
--- TRIGGER 3: sincronizar placar da partida com a contagem de gols
--- (quando status = ENCERRADA e há gols registrados como eventos)
--- ---------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION sync_placar_partida() RETURNS TRIGGER AS $$
 DECLARE
     g_mandante INTEGER;
@@ -99,7 +76,6 @@ BEGIN
     SELECT id_mandante, id_visitante INTO v_id_mandante, v_id_visitante
     FROM partida WHERE id_partida = NEW.id_partida;
 
-    -- Conta gols por equipe: gols marcados por atletas de cada equipe.
     SELECT COUNT(*) INTO g_mandante
     FROM evento e
     JOIN contrato c ON c.id_atleta = e.id_atleta

@@ -1,9 +1,3 @@
-"""
-Janela principal da aplicação SportsLeagueDB.
-
-Monta o notebook com todas as abas (cadastros, operações, partidas, consultas)
-e a barra de menu com: bootstrap do banco, sobre, e teste de conexão.
-"""
 from __future__ import annotations
 
 import tkinter as tk
@@ -32,13 +26,11 @@ class App(tk.Tk):
 
         aplicar_estilo(self)
 
-        # Barra de status (embaixo)
         self.barra_status = ttk.Frame(self, relief="sunken", padding=(6, 2))
         self.barra_status.pack(side="bottom", fill="x")
         self.lbl_status = ttk.Label(self.barra_status, text="Conectando...")
         self.lbl_status.pack(side="left")
 
-        # Notebook de abas
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(fill="both", expand=True, padx=6, pady=6)
 
@@ -47,7 +39,6 @@ class App(tk.Tk):
 
         self.after(100, self._verificar_conexao)
 
-    # ---------------------------------------------------------------
     def _montar_abas(self):
         self.aba_cadastros = self._grupo("📋 Cadastros", [
             ("Modalidades", AbaModalidade),
@@ -71,7 +62,6 @@ class App(tk.Tk):
         self.notebook.add(self.aba_consultas, text="📈 Consultas")
 
     def _grupo(self, titulo: str, itens: list[tuple[str, type]]) -> ttk.Notebook:
-        """Cria uma sub-notebook dentro de uma aba 'grupo'."""
         externa = ttk.Frame(self.notebook)
         self.notebook.add(externa, text=titulo)
         interna = ttk.Notebook(externa)
@@ -81,7 +71,6 @@ class App(tk.Tk):
             interna.add(aba, text=nome)
         return interna
 
-    # ---------------------------------------------------------------
     def _montar_menu(self):
         menubar = tk.Menu(self)
 
@@ -99,7 +88,6 @@ class App(tk.Tk):
 
         self.config(menu=menubar)
 
-    # ---------------------------------------------------------------
     def _verificar_conexao(self):
         ok = db.test_connection()
         if ok:
@@ -139,7 +127,6 @@ class App(tk.Tk):
             log = db.bootstrap()
             informar("Bootstrap concluído", "\n".join(log))
             self._verificar_conexao()
-            # recarrega abas que já estão abertas
             for aba in self._todas_abas():
                 if hasattr(aba, "crud"):
                     aba.crud.atualizar()
@@ -149,12 +136,10 @@ class App(tk.Tk):
             avisar("Erro no bootstrap", f"{e}")
 
     def _todas_abas(self):
-        """Percorre notebooks aninhados para devolver todas as abas."""
         abas = []
         def percorrer(nb):
             for tab_id in nb.tabs():
                 widget = nb.nametowidget(tab_id)
-                # se for notebook interno, desce
                 if isinstance(widget, ttk.Notebook):
                     percorrer(widget)
                 else:

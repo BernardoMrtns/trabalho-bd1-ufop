@@ -1,10 +1,3 @@
--- =====================================================================
--- SportsLeagueDB — Esquema do banco de dados (DDL)
--- Etapa 4 — Scripts SQL
--- SGBD: PostgreSQL 15+
--- =====================================================================
-
--- Limpeza (idempotente — cuidado em produção)
 DROP TABLE IF EXISTS evento                CASCADE;
 DROP TABLE IF EXISTS partida_arbitro       CASCADE;
 DROP TABLE IF EXISTS contrato              CASCADE;
@@ -21,18 +14,12 @@ DROP TABLE IF EXISTS posicao               CASCADE;
 DROP TABLE IF EXISTS estadio               CASCADE;
 DROP TABLE IF EXISTS modalidade            CASCADE;
 
--- ---------------------------------------------------------------------
--- 1. MODALIDADE
--- ---------------------------------------------------------------------
 CREATE TABLE modalidade (
     id_modalidade         SERIAL PRIMARY KEY,
     nome                  VARCHAR(80)  NOT NULL UNIQUE,
     n_jogadores_por_time  SMALLINT     NOT NULL CHECK (n_jogadores_por_time > 0)
 );
 
--- ---------------------------------------------------------------------
--- 2. POSICAO
--- ---------------------------------------------------------------------
 CREATE TABLE posicao (
     id_posicao   SERIAL PRIMARY KEY,
     nome         VARCHAR(60) NOT NULL,
@@ -40,9 +27,6 @@ CREATE TABLE posicao (
     UNIQUE (nome, id_modalidade)
 );
 
--- ---------------------------------------------------------------------
--- 3. ESTADIO
--- ---------------------------------------------------------------------
 CREATE TABLE estadio (
     id_estadio   SERIAL PRIMARY KEY,
     nome         VARCHAR(120) NOT NULL,
@@ -50,9 +34,6 @@ CREATE TABLE estadio (
     capacidade   INTEGER      NOT NULL CHECK (capacidade > 0)
 );
 
--- ---------------------------------------------------------------------
--- 4. EQUIPE
--- ---------------------------------------------------------------------
 CREATE TABLE equipe (
     id_equipe       SERIAL PRIMARY KEY,
     nome            VARCHAR(120) NOT NULL,
@@ -61,9 +42,6 @@ CREATE TABLE equipe (
     id_estadio_sede INTEGER      REFERENCES estadio(id_estadio) ON DELETE SET NULL
 );
 
--- ---------------------------------------------------------------------
--- 5. TEMPORADA
--- ---------------------------------------------------------------------
 CREATE TABLE temporada (
     id_temporada  SERIAL PRIMARY KEY,
     nome          VARCHAR(80)  NOT NULL,
@@ -75,9 +53,6 @@ CREATE TABLE temporada (
     UNIQUE (nome, ano)
 );
 
--- ---------------------------------------------------------------------
--- 6. PESSOA  (superclasse da generalização)
--- ---------------------------------------------------------------------
 CREATE TABLE pessoa (
     id_pessoa     SERIAL PRIMARY KEY,
     nome          VARCHAR(120) NOT NULL,
@@ -87,9 +62,6 @@ CREATE TABLE pessoa (
     tipo          VARCHAR(10)  NOT NULL CHECK (tipo IN ('ATLETA','ARBITRO','TECNICO'))
 );
 
--- ---------------------------------------------------------------------
--- 7. ATLETA / ARBITRO / TECNICO  (especializações)
--- ---------------------------------------------------------------------
 CREATE TABLE atleta (
     id_pessoa  INTEGER PRIMARY KEY REFERENCES pessoa(id_pessoa) ON DELETE CASCADE,
     altura     NUMERIC(3,2) CHECK (altura > 0 AND altura < 3),
@@ -107,27 +79,18 @@ CREATE TABLE tecnico (
     registro_federacao VARCHAR(30)
 );
 
--- ---------------------------------------------------------------------
--- 8. ATLETA_POSICAO  (N:N)
--- ---------------------------------------------------------------------
 CREATE TABLE atleta_posicao (
     id_atleta   INTEGER NOT NULL REFERENCES atleta(id_pessoa)   ON DELETE CASCADE,
     id_posicao  INTEGER NOT NULL REFERENCES posicao(id_posicao) ON DELETE CASCADE,
     PRIMARY KEY (id_atleta, id_posicao)
 );
 
--- ---------------------------------------------------------------------
--- 9. INSCRICAO_TEMPORADA  (N:N equipe×temporada)
--- ---------------------------------------------------------------------
 CREATE TABLE inscricao_temporada (
     id_temporada INTEGER NOT NULL REFERENCES temporada(id_temporada) ON DELETE CASCADE,
     id_equipe    INTEGER NOT NULL REFERENCES equipe(id_equipe)       ON DELETE CASCADE,
     PRIMARY KEY (id_temporada, id_equipe)
 );
 
--- ---------------------------------------------------------------------
--- 10. PARTIDA
--- ---------------------------------------------------------------------
 CREATE TABLE partida (
     id_partida      SERIAL PRIMARY KEY,
     data_hora       TIMESTAMP NOT NULL,
@@ -143,9 +106,6 @@ CREATE TABLE partida (
     UNIQUE (id_estadio, data_hora)
 );
 
--- ---------------------------------------------------------------------
--- 11. PARTIDA_ARBITRO  (N:N com atributo "papel")
--- ---------------------------------------------------------------------
 CREATE TABLE partida_arbitro (
     id_partida  INTEGER NOT NULL REFERENCES partida(id_partida)   ON DELETE CASCADE,
     id_arbitro  INTEGER NOT NULL REFERENCES arbitro(id_pessoa),
@@ -154,9 +114,6 @@ CREATE TABLE partida_arbitro (
     PRIMARY KEY (id_partida, id_arbitro)
 );
 
--- ---------------------------------------------------------------------
--- 12. CONTRATO  (entidade associativa atleta × equipe × temporada)
--- ---------------------------------------------------------------------
 CREATE TABLE contrato (
     id_contrato   SERIAL PRIMARY KEY,
     salario       NUMERIC(12,2) NOT NULL CHECK (salario >= 0),
@@ -169,9 +126,6 @@ CREATE TABLE contrato (
     UNIQUE (id_atleta, id_temporada, data_inicio)
 );
 
--- ---------------------------------------------------------------------
--- 13. EVENTO  (eventos de uma partida)
--- ---------------------------------------------------------------------
 CREATE TABLE evento (
     id_evento   SERIAL PRIMARY KEY,
     tipo        VARCHAR(20) NOT NULL

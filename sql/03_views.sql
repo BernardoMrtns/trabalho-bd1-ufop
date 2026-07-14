@@ -1,14 +1,3 @@
--- =====================================================================
--- SportsLeagueDB — Visões (Views) para consultas pré-definidas
--- Etapa 4
--- =====================================================================
-
--- ---------------------------------------------------------------------
--- VIEW 1: CLASSIFICACAO — tabela de classificação de uma temporada
--- (calcula pontos, jogos, V/E/D, gols pró/contra, saldo)
--- A VIEW base computa por equipe; a aplicação filtra por temporada.
--- Vitória = 3 pts, Empate = 1, Derrota = 0.
--- ---------------------------------------------------------------------
 CREATE OR REPLACE VIEW vw_classificacao AS
 WITH mandante AS (
     SELECT id_temporada, id_mandante AS id_equipe,
@@ -45,9 +34,6 @@ FROM jogos j
 JOIN equipe e ON e.id_equipe = j.id_equipe
 GROUP BY j.id_temporada, j.id_equipe, e.nome, e.sigla;
 
--- ---------------------------------------------------------------------
--- VIEW 2: ARTILHARIA — gols por atleta em partidas encerradas
--- ---------------------------------------------------------------------
 CREATE OR REPLACE VIEW vw_artilharia AS
 SELECT p.id_temporada,
        e.id_atleta,
@@ -64,9 +50,6 @@ LEFT JOIN equipe  eq ON eq.id_equipe = c.id_equipe
 WHERE e.tipo = 'GOL' AND p.status = 'ENCERRADA'
 GROUP BY p.id_temporada, e.id_atleta, pes.nome, eq.nome, eq.sigla;
 
--- ---------------------------------------------------------------------
--- VIEW 3: CARTOES — cartões por atleta
--- ---------------------------------------------------------------------
 CREATE OR REPLACE VIEW vw_cartoes AS
 SELECT p.id_temporada,
        e.id_atleta,
@@ -82,10 +65,6 @@ LEFT JOIN equipe  eq ON eq.id_equipe = c.id_equipe
 WHERE e.tipo IN ('CARTAO_AMARELO','CARTAO_VERMELHO')
 GROUP BY p.id_temporada, e.id_atleta, pes.nome, eq.nome;
 
--- ---------------------------------------------------------------------
--- VIEW 4: CONFRONTOS — histórico entre duas equipes
--- (a aplicação filtra por (id_mandante, id_visitante) ou pelo par)
--- ---------------------------------------------------------------------
 CREATE OR REPLACE VIEW vw_confrontos AS
 SELECT p.id_temporada,
        t.nome AS temporada,
@@ -103,9 +82,6 @@ JOIN equipe ev ON ev.id_equipe = p.id_visitante
 JOIN temporada t ON t.id_temporada = p.id_temporada
 WHERE p.status = 'ENCERRADA';
 
--- ---------------------------------------------------------------------
--- VIEW 5: ELenco — atletas contratados por equipe em uma temporada
--- ---------------------------------------------------------------------
 CREATE OR REPLACE VIEW vw_elenco AS
 SELECT c.id_temporada,
        c.id_equipe,
@@ -120,9 +96,6 @@ JOIN equipe  eq  ON eq.id_equipe   = c.id_equipe
 JOIN atleta  a   ON a.id_pessoa    = c.id_atleta
 JOIN pessoa  pes ON pes.id_pessoa  = c.id_atleta;
 
--- ---------------------------------------------------------------------
--- VIEW 6: PARTIDAS_DETALHADAS — junção amigável para a interface
--- ---------------------------------------------------------------------
 CREATE OR REPLACE VIEW vw_partidas_detalhadas AS
 SELECT p.id_partida,
        p.data_hora,
@@ -142,9 +115,6 @@ JOIN equipe    em ON em.id_equipe   = p.id_mandante
 JOIN equipe    ev ON ev.id_equipe   = p.id_visitante
 JOIN estadio   es ON es.id_estadio  = p.id_estadio;
 
--- ---------------------------------------------------------------------
--- VIEW 7: RESUMO_TEMPORADA — visão geral para o dashboard
--- ---------------------------------------------------------------------
 CREATE OR REPLACE VIEW vw_resumo_temporada AS
 SELECT t.id_temporada,
        t.nome  AS temporada,

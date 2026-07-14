@@ -1,15 +1,3 @@
-"""
-Componente CRUD reutilizável.
-
-CrudoFrame recebe as colunas da tabela e callbacks para:
-  - carregar dados (listar)
-  - abrir formulário de novo (retorna dict ou None)
-  - abrir formulário de edição (recebe linha selecionada, retorna dict ou None)
-  - excluir (recebe linha selecionada)
-
-Ele desenha a tabela, a barra de botões e trata erros (mostrando mensagem).
-As abas concretas instanciam CrudoFrame com seus callbacks específicos.
-"""
 from __future__ import annotations
 
 import tkinter as tk
@@ -45,7 +33,6 @@ class CrudFrame(ttk.Frame):
         self._chave = chave_exclusao
         self._label = label_entidade
 
-        # Barra de botões
         barra = ttk.Frame(self)
         barra.pack(fill="x", pady=(0, 6))
 
@@ -56,7 +43,6 @@ class CrudFrame(ttk.Frame):
         ttk.Button(barra, text="🗑️ Excluir", command=self._excluir).pack(side="left", padx=4)
         ttk.Button(barra, text="🔄 Atualizar", command=self.atualizar).pack(side="left", padx=4)
 
-        # Tabela
         self.tabela = Tabela(self, colunas, on_duplo_clique=self._on_duplo_clique)
         self.tabela.pack(fill="both", expand=True)
 
@@ -65,7 +51,6 @@ class CrudFrame(ttk.Frame):
             self._editar()
 
     def atualizar(self) -> None:
-        """Recarrega a tabela a partir do banco."""
         try:
             dados = self._on_listar()
         except Exception as e:
@@ -105,7 +90,7 @@ class CrudFrame(ttk.Frame):
         if dados is None:
             return
         try:
-            dados["_linha"] = linha  # repassa contexto (chaves primárias)
+            dados["_linha"] = linha
             self._on_atualizar(dados)
             self.atualizar()
             informar("Sucesso", f"{self._label.capitalize()} atualizado.")

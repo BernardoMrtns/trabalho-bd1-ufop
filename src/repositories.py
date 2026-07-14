@@ -1,19 +1,9 @@
-"""
-Repositórios — SportsLeagueDB.
-
-Camada fina entre a GUI e o db.py. Cada função encapsula uma consulta SQL
-específica (escrita à mão, sem ORM). Os parâmetros são sempre passados de
-forma parametrizada (placeholder %s) para evitar injeção de SQL.
-"""
 from __future__ import annotations
 
 from typing import Any
 
 import db
 
-# =============================================================================
-#  Modalidade
-# =============================================================================
 def listar_modalidades() -> list[dict]:
     return db.fetch_all(
         "SELECT id_modalidade, nome, n_jogadores_por_time "
@@ -41,9 +31,6 @@ def remover_modalidade(id_modalidade: int) -> int:
     return db.execute("DELETE FROM modalidade WHERE id_modalidade=%s", (id_modalidade,))
 
 
-# =============================================================================
-#  Posição
-# =============================================================================
 def listar_posicoes() -> list[dict]:
     return db.fetch_all(
         "SELECT p.id_posicao, p.nome, m.nome AS modalidade "
@@ -64,9 +51,6 @@ def remover_posicao(id_posicao: int) -> int:
     return db.execute("DELETE FROM posicao WHERE id_posicao=%s", (id_posicao,))
 
 
-# =============================================================================
-#  Estadio
-# =============================================================================
 def listar_estadios() -> list[dict]:
     return db.fetch_all(
         "SELECT id_estadio, nome, cidade, capacidade "
@@ -93,9 +77,6 @@ def remover_estadio(id_estadio: int) -> int:
     return db.execute("DELETE FROM estadio WHERE id_estadio=%s", (id_estadio,))
 
 
-# =============================================================================
-#  Equipe
-# =============================================================================
 def listar_equipes() -> list[dict]:
     return db.fetch_all(
         "SELECT e.id_equipe, e.nome, e.sigla, e.cidade, "
@@ -127,9 +108,6 @@ def remover_equipe(id_equipe: int) -> int:
     return db.execute("DELETE FROM equipe WHERE id_equipe=%s", (id_equipe,))
 
 
-# =============================================================================
-#  Temporada
-# =============================================================================
 def listar_temporadas() -> list[dict]:
     return db.fetch_all(
         "SELECT t.id_temporada, t.nome, t.ano, t.data_inicio, t.data_fim, "
@@ -164,9 +142,6 @@ def remover_temporada(id_temporada: int) -> int:
     return db.execute("DELETE FROM temporada WHERE id_temporada=%s", (id_temporada,))
 
 
-# =============================================================================
-#  Pessoas (Atleta / Árbitro / Técnico) — generalização
-# =============================================================================
 def listar_pessoas(tipo: str | None = None) -> list[dict]:
     if tipo:
         return db.fetch_all(
@@ -184,7 +159,6 @@ def inserir_atleta(
     nome: str, cpf: str, data_nasc: str, nacionalidade: str,
     altura: float, peso: float, num_camisa: int | None,
 ) -> dict:
-    """Insere em pessoa + atleta numa transação."""
     with db.get_connection() as conn:
         try:
             with conn.cursor(cursor_factory=__real_dict()) as cur:
@@ -257,19 +231,14 @@ def inserir_tecnico(
 
 
 def remover_pessoa(id_pessoa: int) -> int:
-    # ON DELETE CASCADE remove a especialização automaticamente.
     return db.execute("DELETE FROM pessoa WHERE id_pessoa=%s", (id_pessoa,))
 
 
-# atalho para não repetir o import dentro das funções
 def __real_dict():
     from psycopg2.extras import RealDictCursor
     return RealDictCursor
 
 
-# =============================================================================
-#  Contrato
-# =============================================================================
 def listar_contratos() -> list[dict]:
     return db.fetch_all(
         "SELECT c.id_contrato, pes.nome AS atleta, eq.nome AS equipe, "
@@ -299,9 +268,6 @@ def remover_contrato(id_contrato: int) -> int:
     return db.execute("DELETE FROM contrato WHERE id_contrato=%s", (id_contrato,))
 
 
-# =============================================================================
-#  Inscrição de equipe em temporada
-# =============================================================================
 def listar_inscricoes() -> list[dict]:
     return db.fetch_all(
         "SELECT i.id_temporada, t.nome AS temporada, "
@@ -327,9 +293,6 @@ def remover_inscricao(id_temporada: int, id_equipe: int) -> int:
     )
 
 
-# =============================================================================
-#  Partida
-# =============================================================================
 def listar_partidas() -> list[dict]:
     return db.fetch_all(
         "SELECT * FROM vw_partidas_detalhadas ORDER BY data_hora DESC"
@@ -360,9 +323,6 @@ def remover_partida(id_partida: int) -> int:
     return db.execute("DELETE FROM partida WHERE id_partida=%s", (id_partida,))
 
 
-# =============================================================================
-#  Evento de partida
-# =============================================================================
 def listar_eventos(id_partida: int | None = None) -> list[dict]:
     if id_partida is None:
         return db.fetch_all(
@@ -404,9 +364,6 @@ def remover_evento(id_evento: int) -> int:
     return db.execute("DELETE FROM evento WHERE id_evento=%s", (id_evento,))
 
 
-# =============================================================================
-#  Consultas pré-definidas (relatórios)
-# =============================================================================
 def classificacao(id_temporada: int) -> list[dict]:
     return db.fetch_all(
         "SELECT posicao, equipe, sigla, jogos, vitorias, empates, derrotas, "
@@ -438,7 +395,6 @@ def cartoes(id_temporada: int) -> list[dict]:
 
 
 def confrontos(id_equipe_a: int, id_equipe_b: int) -> list[dict]:
-    """Histórico entre duas equipes (considera ambos os mandos)."""
     return db.fetch_all(
         "SELECT temporada, data_hora, mandante, visitante, "
         "       gols_mandante, gols_visitante, resultado "

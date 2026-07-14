@@ -1,9 +1,3 @@
-"""
-Aba de Partidas e seus Eventos.
-
-Layout: lista de partidas em cima; ao selecionar uma, os eventos dela aparecem
-embaixo, com botões para adicionar/remover eventos (gols, cartões, substituições).
-"""
 from __future__ import annotations
 
 import tkinter as tk
@@ -21,7 +15,6 @@ class AbaPartidas(ttk.Frame):
     def __init__(self, master):
         super().__init__(master, padding=8)
 
-        # ---------- Parte superior: partidas ----------
         top = ttk.LabelFrame(self, text="Partidas")
         top.pack(fill="both", expand=True, pady=(0, 6))
 
@@ -47,7 +40,6 @@ class AbaPartidas(ttk.Frame):
         self.tab_partidas.pack(fill="both", expand=True, padx=6, pady=(0, 6))
         self.tab_partidas.tree.bind("<<TreeviewSelect>>", lambda _e: self._carregar_eventos())
 
-        # ---------- Parte inferior: eventos da partida selecionada ----------
         bottom = ttk.LabelFrame(self, text="Eventos da partida selecionada")
         bottom.pack(fill="both", expand=True)
 
@@ -70,7 +62,6 @@ class AbaPartidas(ttk.Frame):
 
         self.after(50, self._atualizar)
 
-    # ---------------- Partidas ----------------
     def _atualizar(self):
         try:
             partidas = rep.listar_partidas()
@@ -144,7 +135,6 @@ class AbaPartidas(ttk.Frame):
         except Exception as e:
             avisar("Erro ao excluir", f"{e}")
 
-    # ---------------- Eventos ----------------
     def _carregar_eventos(self):
         linha = self._partida_selecionada()
         if not linha:
@@ -164,7 +154,6 @@ class AbaPartidas(ttk.Frame):
             return
         atletas = [f'{a["id_pessoa"]} - {a["nome"]}'
                    for a in rep.listar_pessoas("ATLETA")]
-        # Pré-formata lista com "(nenhum)" para segundo atleta
         atletas2 = ["(nenhum)"] + atletas
         dados = perguntar(self, "Novo Evento", [
             {"chave": "tipo", "rotulo": "Tipo:", "tipo": "combo",
@@ -177,7 +166,6 @@ class AbaPartidas(ttk.Frame):
         ])
         if not dados:
             return
-        # Se tipo != SUBSTITUICAO, ignora atleta2
         id_atleta2 = None
         if dados["tipo"] == "SUBSTITUICAO" and not dados["atleta2"].startswith("("):
             id_atleta2 = to_int(dados["atleta2"].split(" - ")[0])
@@ -190,7 +178,7 @@ class AbaPartidas(ttk.Frame):
                 to_optional_str(dados.get("descricao")),
             )
             self._carregar_eventos()
-            self._atualizar()  # placar pode ter mudado via trigger
+            self._atualizar()
             informar("Sucesso", "Evento registrado.")
         except Exception as e:
             avisar("Erro ao inserir evento", f"{e}")

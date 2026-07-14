@@ -1,7 +1,3 @@
-"""
-Abas operacionais: Temporada, Pessoas (Atleta/Árbitro/Técnico),
-Inscrições e Contratos.
-"""
 from __future__ import annotations
 
 import tkinter as tk
@@ -13,9 +9,6 @@ from .util import to_int, to_float, to_str, to_optional_str
 from .widgets import perguntar
 
 
-# =============================================================================
-#  Temporada
-# =============================================================================
 class AbaTemporada(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -80,9 +73,6 @@ class AbaTemporada(ttk.Frame):
         rep.remover_temporada(int(linha["id_temporada"]))
 
 
-# =============================================================================
-#  Atletas / Árbitros / Técnicos (usamos CrudFrame com on_listar filtrado)
-# =============================================================================
 class AbaAtletas(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -207,9 +197,6 @@ class AbaTecnicos(ttk.Frame):
         rep.remover_pessoa(int(linha["id_pessoa"]))
 
 
-# =============================================================================
-#  Inscrição (equipe × temporada) e Contrato
-# =============================================================================
 class AbaInscricao(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)

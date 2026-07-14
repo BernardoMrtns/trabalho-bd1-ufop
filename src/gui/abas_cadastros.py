@@ -1,6 +1,3 @@
-"""
-Abas de cadastros básicos: Modalidade, Posição, Estádio, Equipe.
-"""
 from __future__ import annotations
 
 import tkinter as tk
@@ -12,9 +9,6 @@ from .util import to_int, to_str, to_optional_str
 from .widgets import perguntar
 
 
-# =============================================================================
-#  Modalidade
-# =============================================================================
 class AbaModalidade(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -62,9 +56,6 @@ class AbaModalidade(ttk.Frame):
         rep.remover_modalidade(int(linha["id_modalidade"]))
 
 
-# =============================================================================
-#  Posição
-# =============================================================================
 class AbaPosicao(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -101,9 +92,6 @@ class AbaPosicao(ttk.Frame):
         rep.remover_posicao(int(linha["id_posicao"]))
 
 
-# =============================================================================
-#  Estádio
-# =============================================================================
 class AbaEstadio(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -156,9 +144,6 @@ class AbaEstadio(ttk.Frame):
         rep.remover_estadio(int(linha["id_estadio"]))
 
 
-# =============================================================================
-#  Equipe
-# =============================================================================
 class AbaEquipe(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -196,7 +181,6 @@ class AbaEquipe(ttk.Frame):
         ])
 
     def _form_editar(self, linha):
-        # tenta pré-selecionar o estádio
         return perguntar(self, "Editar Equipe", [
             {"chave": "nome", "rotulo": "Nome:", "valor": linha["nome"]},
             {"chave": "sigla", "rotulo": "Sigla (até 5):", "valor": linha["sigla"]},

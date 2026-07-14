@@ -1,12 +1,3 @@
-"""
-Widgets reutilizáveis da GUI — SportsLeagueDB.
-
-Componentes usados pelas abas:
-  - Tabela:   Treeview com colunas configuráveis, ordenação e barra de rolagem.
-  - Formulario: janela modal (Toplevel) que monta campos a partir de uma definição
-                e devolve um dicionário com os valores digitados.
-  - ComboBoxSearch: Combobox com auto-preenchimento de opções.
-"""
 from __future__ import annotations
 
 import tkinter as tk
@@ -14,9 +5,6 @@ from tkinter import ttk, messagebox
 from typing import Any, Callable
 
 
-# ---------------------------------------------------------------------------
-# Estilo visual centralizado
-# ---------------------------------------------------------------------------
 def aplicar_estilo(root: tk.Tk) -> None:
     style = ttk.Style(root)
     try:
@@ -31,16 +19,11 @@ def aplicar_estilo(root: tk.Tk) -> None:
     style.configure("TCombobox", font=("Segoe UI", 10))
 
 
-# ---------------------------------------------------------------------------
-# Tabela (Treeview) com colunas, cabeçalho clicável e ordenação
-# ---------------------------------------------------------------------------
 class Tabela(ttk.Frame):
-    """Treeview empacotado com scrollbar e suporte a duplo-clique em linha."""
-
     def __init__(
         self,
         master,
-        colunas: list[tuple[str, str, int]],  # (chave, título, largura)
+        colunas: list[tuple[str, str, int]],
         on_duplo_clique: Callable[[dict], None] | None = None,
     ):
         super().__init__(master)
@@ -107,18 +90,7 @@ class Tabela(ttk.Frame):
             self._on_duplo(self.linha_selecionada())
 
 
-# ---------------------------------------------------------------------------
-# Diálogo de formulário genérico
-# ---------------------------------------------------------------------------
 class Formulario(tk.Toplevel):
-    """
-    Janela modal que monta campos a partir de uma especificação.
-
-    campos: lista de dicts:
-        { "chave": str, "rotulo": str, "tipo": "texto"|"numero"|"data"|"combo",
-          "opcoes": [...] (se combo), "obrigatorio": bool, "valor": inicial }
-    """
-
     def __init__(self, master, titulo: str, campos: list[dict]):
         super().__init__(master)
         self.title(titulo)
@@ -163,7 +135,6 @@ class Formulario(tk.Toplevel):
         self.bind("<Return>", lambda _e: self._salvar())
         self.bind("<Escape>", lambda _e: self._cancelar())
 
-        # Centraliza
         self.update_idletasks()
         w, h = self.winfo_width(), self.winfo_height()
         sw, sh = self.winfo_screenwidth(), self.winfo_screenheight()
@@ -195,7 +166,6 @@ class Formulario(tk.Toplevel):
 
 
 def perguntar(master, titulo: str, campos: list[dict]) -> dict | None:
-    """Abre Formulario e devolve o dict preenchido (ou None se cancelado)."""
     form = Formulario(master, titulo, campos)
     master.wait_window(form)
     return form.resultado

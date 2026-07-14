@@ -1,9 +1,3 @@
-"""
-Utilidades de conversão de tipos para a GUI.
-
-Os formulários devolvem strings. As funções SQL esperam int/float/None.
-Estes helpers fazem a normalização mantendo o código das abas legível.
-"""
 from __future__ import annotations
 
 from typing import Any

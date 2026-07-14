@@ -1,16 +1,3 @@
-"""
-Aba de Consultas e Relatórios.
-
-Oferece os relatórios pré-definidos (via views do banco):
-  - Classificação do campeonato
-  - Artilharia
-  - Cartões por atleta
-  - Histórico de confrontos entre duas equipes
-  - Elenco de uma equipe em uma temporada
-  - Resumo geral das temporadas
-
-Cada relatório tem um seletor de parâmetros e um botão "Gerar".
-"""
 from __future__ import annotations
 
 import tkinter as tk
@@ -25,7 +12,6 @@ class AbaConsultas(ttk.Frame):
     def __init__(self, master):
         super().__init__(master, padding=8)
 
-        # Notebook com os relatórios
         self.nb = ttk.Notebook(self)
         self.nb.pack(fill="both", expand=True)
 
@@ -36,7 +22,6 @@ class AbaConsultas(ttk.Frame):
         self._confrontos = self._aba_confrontos()
         self._elenco = self._aba_elenco()
 
-    # -------------------- utilidades --------------------
     def _seletor_temporada(self, parent):
         frame = ttk.Frame(parent)
         ttk.Label(frame, text="Temporada:").pack(side="left")
@@ -56,7 +41,6 @@ class AbaConsultas(ttk.Frame):
             return None
         return to_int(cb_value.split(" - ")[0])
 
-    # -------------------- 1. Resumo --------------------
     def _aba_resumo(self):
         f = ttk.Frame(self.nb, padding=6)
         self.nb.add(f, text="📊 Resumo")
@@ -83,7 +67,6 @@ class AbaConsultas(ttk.Frame):
         except Exception as e:
             avisar("Erro", f"{e}")
 
-    # -------------------- 2. Classificação --------------------
     def _aba_classificacao(self):
         f = ttk.Frame(self.nb, padding=6)
         self.nb.add(f, text="🏆 Classificação")
@@ -117,7 +100,6 @@ class AbaConsultas(ttk.Frame):
         except Exception as e:
             avisar("Erro", f"{e}")
 
-    # -------------------- 3. Artilharia --------------------
     def _aba_artilharia(self):
         f = ttk.Frame(self.nb, padding=6)
         self.nb.add(f, text="⚽ Artilharia")
@@ -144,7 +126,6 @@ class AbaConsultas(ttk.Frame):
         except Exception as e:
             avisar("Erro", f"{e}")
 
-    # -------------------- 4. Cartões --------------------
     def _aba_cartoes(self):
         f = ttk.Frame(self.nb, padding=6)
         self.nb.add(f, text="🟨🟥 Cartões")
@@ -171,7 +152,6 @@ class AbaConsultas(ttk.Frame):
         except Exception as e:
             avisar("Erro", f"{e}")
 
-    # -------------------- 5. Confrontos --------------------
     def _aba_confrontos(self):
         f = ttk.Frame(self.nb, padding=6)
         self.nb.add(f, text="⚔️ Confrontos")
@@ -218,7 +198,6 @@ class AbaConsultas(ttk.Frame):
         except Exception as e:
             avisar("Erro", f"{e}")
 
-    # -------------------- 6. Elenco --------------------
     def _aba_elenco(self):
         f = ttk.Frame(self.nb, padding=6)
         self.nb.add(f, text="👥 Elenco")
