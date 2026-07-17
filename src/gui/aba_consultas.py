@@ -25,15 +25,38 @@ class AbaConsultas(ttk.Frame):
     def _seletor_temporada(self, parent):
         frame = ttk.Frame(parent)
         ttk.Label(frame, text="Temporada:").pack(side="left")
-        cb = ttk.Combobox(frame, state="readonly", width=40)
+        cb = ttk.Combobox(
+            frame, 
+            state="readonly", 
+            width=40,
+            postcommand=lambda: self._atualizar_opcoes_temporada(cb)
+        )
         cb.pack(side="left", padx=4)
+        
+        self._atualizar_opcoes_temporada(cb)
+        
+        return frame, cb
+
+    def _atualizar_opcoes_temporada(self, cb):
+        """Busca as temporadas atualizadas no banco e atualiza o combobox."""
         try:
             temps = rep.listar_temporadas()
-            cb["values"] = [f'{t["id_temporada"]} - {t["nome"]} ({t["ano"]})'
-                            for t in temps]
-        except Exception:
+            valores = [f'{t["id_temporada"]} - {t["nome"]} ({t["ano"]})'
+                       for t in temps]
+            cb["values"] = valores
+        except Exception as e:
+            print(f"Erro ao atualizar temporadas: {e}")
             cb["values"] = []
-        return frame, cb
+
+    def _atualizar_opcoes_equipe(self, cb):
+        """Busca as equipes atualizadas no banco e atualiza o combobox."""
+        try:
+            equips = rep.listar_equipes()
+            valores = [f'{e["id_equipe"]} - {e["nome"]}' for e in equips]
+            cb["values"] = valores
+        except Exception as e:
+            print(f"Erro ao atualizar equipes: {e}")
+            cb["values"] = []
 
     @staticmethod
     def _id_temp(cb_value):
@@ -159,20 +182,29 @@ class AbaConsultas(ttk.Frame):
         sel = ttk.Frame(f)
         sel.pack(anchor="w", fill="x")
         ttk.Label(sel, text="Equipe A:").pack(side="left")
-        self.cb_conf_a = ttk.Combobox(sel, state="readonly", width=30)
+        
+        self.cb_conf_a = ttk.Combobox(
+            sel, 
+            state="readonly", 
+            width=30,
+            postcommand=lambda: self._atualizar_opcoes_equipe(self.cb_conf_a)
+        )
         self.cb_conf_a.pack(side="left", padx=4)
+        
         ttk.Label(sel, text="Equipe B:").pack(side="left")
-        self.cb_conf_b = ttk.Combobox(sel, state="readonly", width=30)
+        
+        self.cb_conf_b = ttk.Combobox(
+            sel, 
+            state="readonly", 
+            width=30,
+            postcommand=lambda: self._atualizar_opcoes_equipe(self.cb_conf_b)
+        )
         self.cb_conf_b.pack(side="left", padx=4)
+        
         ttk.Button(f, text="Gerar", command=self._gerar_confrontos).pack(anchor="w", pady=4)
 
-        try:
-            equips = rep.listar_equipes()
-            valores = [f'{e["id_equipe"]} - {e["nome"]}' for e in equips]
-            self.cb_conf_a["values"] = valores
-            self.cb_conf_b["values"] = valores
-        except Exception:
-            pass
+        self._atualizar_opcoes_equipe(self.cb_conf_a)
+        self._atualizar_opcoes_equipe(self.cb_conf_b)
 
         self.t_conf = Tabela(
             f,
@@ -205,21 +237,30 @@ class AbaConsultas(ttk.Frame):
         sel = ttk.Frame(f)
         sel.pack(anchor="w", fill="x")
         ttk.Label(sel, text="Temporada:").pack(side="left")
-        self.cb_elo_t = ttk.Combobox(sel, state="readonly", width=35)
+        
+        self.cb_elo_t = ttk.Combobox(
+            sel, 
+            state="readonly", 
+            width=35,
+            postcommand=lambda: self._atualizar_opcoes_temporada(self.cb_elo_t)
+        )
         self.cb_elo_t.pack(side="left", padx=4)
+        
         ttk.Label(sel, text="Equipe:").pack(side="left")
-        self.cb_elo_e = ttk.Combobox(sel, state="readonly", width=30)
+        
+        self.cb_elo_e = ttk.Combobox(
+            sel, 
+            state="readonly", 
+            width=30,
+            postcommand=lambda: self._atualizar_opcoes_equipe(self.cb_elo_e)
+        )
         self.cb_elo_e.pack(side="left", padx=4)
+        
         ttk.Button(f, text="Gerar", command=self._gerar_elenco).pack(anchor="w", pady=4)
 
-        try:
-            temps = rep.listar_temporadas()
-            equips = rep.listar_equipes()
-            self.cb_elo_t["values"] = [f'{t["id_temporada"]} - {t["nome"]} ({t["ano"]})'
-                                       for t in temps]
-            self.cb_elo_e["values"] = [f'{e["id_equipe"]} - {e["nome"]}' for e in equips]
-        except Exception:
-            pass
+        # Carga inicial
+        self._atualizar_opcoes_temporada(self.cb_elo_t)
+        self._atualizar_opcoes_equipe(self.cb_elo_e)
 
         self.t_elo = Tabela(
             f,
