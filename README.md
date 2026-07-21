@@ -1,4 +1,4 @@
-# SportsLeagueDB — Projeto Prático de Banco de Dados (CSI440 / CSI602)
+# SportsLeagueDB — Projeto Prático de Banco de Dados CSI440
 
 
 
